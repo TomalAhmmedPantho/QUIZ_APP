@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - QuizPoint</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Student Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Welcome to Your Dashboard</h2>
+            <button onclick="redirectTo('associated-teachers.html')">View Associated Teachers</button>
+            <button onclick="redirectTo('quiz.html')">View  Quizzes</button>
+            <button onclick="redirectTo('quiz-results.html')">View Quiz Results</button>
+        </section>
+    </main>
+
+    <script>
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            alert('You are not logged in. Redirecting to login page.');
+            window.location.href = 'login-student.html';
+        }
+
+        // Redirect to specific pages
+        function redirectTo(page) {
+            window.location.href = page;
+        }
+
+        // Logout functionality
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>

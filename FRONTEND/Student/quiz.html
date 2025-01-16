@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Available Quizzes</h1>
+        <nav>
+            <ul>
+                <li><a href="student.html">Dashboard</a></li>
+                <li><a href="../index.html" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <!-- Running Quizzes Section -->
+        <section>
+            <h2>Running Quizzes</h2>
+            <div id="running-quizzes">
+                <p>Loading running quizzes...</p>
+            </div>
+        </section>
+
+        <!-- Upcoming Quizzes Section -->
+        <section>
+            <h2>Upcoming Quizzes</h2>
+            <div id="upcoming-quizzes">
+                <p>Loading upcoming quizzes...</p>
+            </div>
+        </section>
+
+        <!-- Quiz Details Section -->
+        <section id="quiz-details" style="display: none;">
+            <h2 id="quiz-title"></h2>
+            <p id="quiz-description"></p>
+            <form id="quiz-form">
+                <div id="questions-container">
+                    <!-- Questions will be dynamically added here -->
+                </div>
+                <button type="submit">Submit Quiz</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+        const baseUrl = 'http://localhost:5000/api'; // Backend API base URL
+        const token = sessionStorage.getItem('token');
+
+        // Redirect to login if token is missing
+        if (!token) {
+            alert('You are not logged in. Redirecting to login page.');
+            window.location.href = '../index.html';
+        }
+
+        // Fetch and display quizzes (running and upcoming)
+        async function loadQuizzes() {
+            const runningContainer = document.getElementById('running-quizzes');
+            const upcomingContainer = document.getElementById('upcoming-quizzes');
+            try {
+                const response = await fetch(`${baseUrl}/student/quizzes`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch quizzes.');
+                }
+
+                const data = await response.json();
+                const now = new Date();
+
+                const runningQuizzes = data.quizzes.filter(
+                    (quiz) => new Date(quiz.startTime) <= now && new Date(quiz.endTime) >= now
+                );
+                const upcomingQuizzes = data.quizzes.filter((quiz) => new Date(quiz.startTime) > now);
+
+                // Render running quizzes
+                runningContainer.innerHTML = runningQuizzes.length
+                    ? runningQuizzes.map((quiz) => renderQuizCard(quiz, true)).join('')
+                    : '<p>No running quizzes found.</p>';
+
+                // Render upcoming quizzes
+                upcomingContainer.innerHTML = upcomingQuizzes.length
+                    ? upcomingQuizzes.map((quiz) => renderQuizCard(quiz, false)).join('')
+                    : '<p>No upcoming quizzes found.</p>';
+            } catch (error) {
+                console.error('Error loading quizzes:', error);
+                runningContainer.innerHTML = '<p>Error loading running quizzes.</p>';
+                upcomingContainer.innerHTML = '<p>Error loading upcoming quizzes.</p>';
+            }
+        }
+
+        // Render a single quiz card
+        function renderQuizCard(quiz, isRunning) {
+            return `
+                <div class="quiz-card">
+                    <h3>${quiz.title}</h3>
+                    <p>${quiz.description || 'No description available.'}</p>
+                    <p><strong>Start Time:</strong> ${new Date(quiz.startTime).toLocaleString()}</p>
+                    <p><strong>End Time:</strong> ${new Date(quiz.endTime).toLocaleString()}</p>
+                    ${
+                        isRunning
+                            ? `<button onclick="loadQuizDetails('${quiz._id}')">Take Quiz</button>`
+                            : '<p>Not yet started.</p>'
+                    }
+                </div>
+            `;
+        }
+
+        // Fetch and display quiz details
+        async function loadQuizDetails(quizId) {
+            const quizDetailsSection = document.getElementById('quiz-details');
+            const questionsContainer = document.getElementById('questions-container');
+            const quizTitle = document.getElementById('quiz-title');
+            const quizDescription = document.getElementById('quiz-description');
+
+            try {
+                const response = await fetch(`${baseUrl}/quiz/${quizId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to load quiz details.');
+                }
+
+                const quiz = await response.json();
+
+                // Check if the student has already submitted this quiz
+                const submissionResponse = await fetch(`${baseUrl}/student/quiz/${quizId}/submission`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                let isSubmitted = false;
+                if (submissionResponse.ok) {
+                    isSubmitted = true; // Quiz already submitted
+                }
+
+                quizTitle.textContent = quiz.title;
+                quizDescription.textContent = quiz.description || 'No description available.';
+                questionsContainer.innerHTML = quiz.questions
+                    .map((question, index) => renderQuestion(question, index + 1))
+                    .join('');
+
+                quizDetailsSection.style.display = 'block';
+                window.scrollTo(0, quizDetailsSection.offsetTop);
+
+                if (isSubmitted) {
+                    alert('You have already submitted this quiz.');
+                    document.getElementById('quiz-form').innerHTML = '<p>You have already submitted this quiz.</p>';
+                } else {
+                    // Handle quiz submission
+                    document.getElementById('quiz-form').onsubmit = async (event) => {
+                        event.preventDefault();
+                        const answers = [];
+                        quiz.questions.forEach((question) => {
+                            const selectedChoice = document.querySelector(
+                                `input[name="question-${question._id}"]:checked`
+                            );
+                            if (selectedChoice) {
+                                answers.push({
+                                    questionId: question._id,
+                                    selectedChoice: selectedChoice.value,
+                                });
+                            }
+                        });
+
+                        try {
+                            const submissionResponse = await fetch(`${baseUrl}/student/quiz/submit`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({ quizId, answers }),
+                            });
+
+                            if (!submissionResponse.ok) {
+                                const errorData = await submissionResponse.json();
+                                throw new Error(errorData.message || 'Failed to submit quiz.');
+                            }
+
+                            const result = await submissionResponse.json();
+                            alert(`Quiz submitted! You scored ${result.score}/${result.totalQuestions}.`);
+                            quizDetailsSection.style.display = 'none'; // Hide quiz details
+                            loadQuizzes(); // Reload quizzes
+                        } catch (error) {
+                            console.error('Error submitting quiz:', error);
+                            alert('An error occurred while submitting the quiz.');
+                        }
+                    };
+                }
+            } catch (error) {
+                console.error('Error loading quiz details:', error);
+                alert('Failed to load quiz details. Please try again later.');
+            }
+        }
+
+        // Render a single question
+        function renderQuestion(question, index) {
+            return `
+                <div class="question">
+                    <p><strong>Q${index}:</strong> ${question.questionText}</p>
+                    ${question.choices
+                        .map(
+                            (choice) => `
+                            <label>
+                                <input type="radio" name="question-${question._id}" value="${choice.text}" />
+                                ${choice.text}
+                            </label>
+                        `
+                        )
+                        .join('')}
+                </div>
+            `;
+        }
+
+        // Load quizzes on page load
+        window.onload = loadQuizzes;
+
+        // Logout functionality
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>

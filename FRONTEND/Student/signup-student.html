@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Signup - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Student Signup</h1>
+    </header>
+    <main>
+        <form id="student-signup-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter a strong password" required>
+
+            <button type="submit">Signup</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+        document.getElementById('student-signup-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Get form values
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Frontend Validation: Check if all fields are filled
+            if (!name || !email || !password) {
+                alert('All fields are required. Please fill out the form.');
+                return;
+            }
+
+            try {
+                // API request to register a student
+                const response = await fetch('http://localhost:5000/api/student/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password }),
+                });
+
+                if (response.ok) {
+                    alert('Signup successful! Redirecting to login.');
+                    window.location.href = 'login-student.html'; // Redirect to login page
+                } else {
+                    const errorData = await response.json();
+                    alert(`Signup failed: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error signing up:', error);
+                alert('Unable to connect to the server. Please try again later.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>My Quiz Results</h1>
+        <nav>
+            <ul>
+                <li><a href="student.html">Dashboard</a></li>
+                <li><a href="../index.html" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="quiz-results-container">
+            <p>Loading quiz results...</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+        const baseUrl = 'http://localhost:5000/api'; // Backend API base URL
+        const token = sessionStorage.getItem('token');
+
+        // Redirect to login if token is missing
+        if (!token) {
+            alert('You are not logged in. Redirecting to login page.');
+            window.location.href = '../index.html';
+        }
+
+        // Fetch and display quiz results
+        async function loadQuizResults() {
+            const container = document.getElementById('quiz-results-container');
+            try {
+                const response = await fetch(`${baseUrl}/student/quiz-results`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status === 404) {
+                        container.innerHTML = '<p>No quiz results found.</p>';
+                    } else {
+                        throw new Error(errorData.message || 'Failed to fetch quiz results.');
+                    }
+                    return;
+                }
+
+                const data = await response.json();
+                const results = data.submissions || [];
+
+                if (results.length === 0) {
+                    container.innerHTML = '<p>No quiz results found.</p>';
+                } else {
+                    container.innerHTML = results
+                        .map((result) => renderResult(result))
+                        .join('');
+                }
+            } catch (error) {
+                console.error('Error loading quiz results:', error);
+                container.innerHTML = '<p>Error loading quiz results. Please try again later.</p>';
+            }
+        }
+
+        // Render a single quiz result
+        function renderResult(result) {
+            return `
+                <div class="quiz-result">
+                    <h3>${result.quizId.title}</h3>
+                    <p>${result.quizId.description || 'No description available.'}</p>
+                    <p><strong>Score:</strong> ${result.score}/${result.totalQuestions}</p>
+                    <p><strong>Date:</strong> ${new Date(result.createdAt).toLocaleString()}</p>
+                    <p><strong>Start Time:</strong> ${new Date(result.quizId.startTime).toLocaleString()}</p>
+                    <p><strong>End Time:</strong> ${new Date(result.quizId.endTime).toLocaleString()}</p>
+                </div>
+            `;
+        }
+
+        // Load quiz results on page load
+        window.onload = loadQuizResults;
+
+        // Logout functionality
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>

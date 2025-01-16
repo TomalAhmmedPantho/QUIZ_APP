@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Submissions - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Quiz Submissions</h1>
+        <nav>
+            <ul>
+                <li><a href="teacher.html">Dashboard</a></li>
+                <li><a href="../index.html" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <label for="quiz-search">Search by Quiz Title or ID:</label>
+            <input type="text" id="quiz-search" placeholder="Enter Quiz Title or ID" />
+            <button onclick="loadSubmissions()">Search</button>
+        </section>
+        <section id="submissions-container">
+            <p>Enter a Quiz Title or ID to view submissions.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+        const baseUrl = 'http://localhost:5000/api'; // Backend API base URL
+        const token = sessionStorage.getItem('token');
+
+        // Redirect to login if token is missing
+        if (!token) {
+            alert('You are not logged in. Redirecting to login page.');
+            window.location.href = '../index.html';
+        }
+
+        // Fetch and display submissions for a quiz
+        async function loadSubmissions() {
+            const searchQuery = document.getElementById('quiz-search').value.trim();
+            const container = document.getElementById('submissions-container');
+
+            if (!searchQuery) {
+                container.innerHTML = '<p>Please enter a valid Quiz Title or ID.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${baseUrl}/teacher/quiz/submissions?quizTitle=${searchQuery}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status === 404) {
+                        container.innerHTML = `<p>${errorData.message}</p>`;
+                    } else {
+                        throw new Error(errorData.message || 'Failed to fetch submissions.');
+                    }
+                    return;
+                }
+
+                const data = await response.json();
+                const submissions = data.submissions || [];
+                const quiz = data.quiz || {};
+
+                if (submissions.length === 0) {
+                    container.innerHTML = '<p>No submissions found for this quiz.</p>';
+                } else {
+                    container.innerHTML = `
+                        <h2>${quiz.title}</h2>
+                        <p>${quiz.description || 'No description available.'}</p>
+                        ${submissions.map((submission) => renderSubmission(submission)).join('')}
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading submissions:', error);
+                container.innerHTML = '<p>Error loading submissions. Please try again later.</p>';
+            }
+        }
+
+        // Render a single submission
+        function renderSubmission(submission) {
+            return `
+                <div class="submission">
+                    <h3>${submission.studentId.name} (${submission.studentId.email})</h3>
+                    <p><strong>Score:</strong> ${submission.score}/${submission.totalQuestions}</p>
+                    <p><strong>Submission Date:</strong> ${new Date(submission.createdAt).toLocaleString()}</p>
+                </div>
+            `;
+        }
+
+        // Logout functionality
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>

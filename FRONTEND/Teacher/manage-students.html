@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Manage Students</h1>
+        <nav>
+            <ul>
+                <li><a href="teacher.html">Dashboard</a></li>
+                <li><a href="../index.html" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <!-- Section for Associated Students -->
+        <section>
+            <h2>Associated Students</h2>
+            <div id="associated-students">
+                <p>Loading associated students...</p>
+            </div>
+        </section>
+
+        <!-- Section for All Registered Students -->
+        <section>
+            <h2>All Registered Students</h2>
+            <div id="all-students">
+                <p>Loading all students...</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+       const baseUrl = 'http://localhost:5000/api'; // Backend API base URL
+const token = sessionStorage.getItem('token');
+
+// Redirect to login if token is missing
+if (!token) {
+    alert('You are not logged in. Redirecting to login page.');
+    window.location.href = '../index.html';
+}
+
+// Fetch associated students
+async function loadAssociatedStudents() {
+    const container = document.getElementById('associated-students');
+    try {
+        const response = await fetch(`${baseUrl}/teacher/students/associated`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch associated students.');
+        }
+
+        const data = await response.json();
+        const associatedStudents = data.associatedStudents || [];
+
+        if (associatedStudents.length === 0) {
+            container.innerHTML = '<p>No associated students found.</p>';
+        } else {
+            container.innerHTML = associatedStudents.map(student => `
+                <div class="student">
+                    <h3>${student.name}</h3>
+                    <p>${student.email}</p>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error loading associated students:', error);
+        container.innerHTML = '<p>Error loading associated students.</p>';
+    }
+}
+
+// Fetch all registered students not associated with any teacher
+async function loadAllStudents() {
+    const container = document.getElementById('all-students');
+    try {
+        const response = await fetch(`${baseUrl}/teacher/students/registered`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch all students.');
+        }
+
+        const data = await response.json();
+        const registeredStudents = data.registeredStudents || [];
+
+        if (registeredStudents.length === 0) {
+            container.innerHTML = '<p>No unassociated students found.</p>';
+        } else {
+            container.innerHTML = registeredStudents.map(student => `
+                <div class="student">
+                    <h3>${student.name}</h3>
+                    <p>${student.email}</p>
+                    <button onclick="addStudent('${student._id}')">Add Student</button>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error loading all students:', error);
+        container.innerHTML = '<p>Error loading all students.</p>';
+    }
+}
+
+// Add a student to the teacher's associated list
+async function addStudent(studentId) {
+    try {
+        const response = await fetch(`${baseUrl}/teacher/students`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ studentId }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add student.');
+        }
+
+        alert('Student added successfully!');
+        loadAssociatedStudents(); // Refresh associated students list
+        loadAllStudents(); // Refresh all students list
+    } catch (error) {
+        console.error('Error adding student:', error);
+        alert(`Error adding student: ${error.message}`);
+    }
+}
+
+// Load both sections on page load
+window.onload = function () {
+    loadAssociatedStudents();
+    loadAllStudents();
+};
+
+// Logout functionality
+document.getElementById('logout').addEventListener('click', () => {
+    sessionStorage.clear();
+    window.location.href = '../index.html';
+});
+
+    </script>
+    
+</body>
+</html>

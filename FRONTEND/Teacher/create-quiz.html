@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Create a Quiz</h1>
+        <nav>
+            <ul>
+                <li><a href="teacher.html">Dashboard</a></li>
+                <li><a href="../index.html" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <form id="quiz-form">
+            <label for="title">Quiz Title:</label>
+            <input type="text" id="title" name="title" placeholder="Enter quiz title" required>
+
+            <label for="description">Quiz Description:</label>
+            <textarea id="description" name="description" placeholder="Enter a short description of the quiz"></textarea>
+
+            <div id="questions-container">
+                <!-- Questions will be dynamically added here -->
+            </div>
+
+            <button type="button" onclick="addQuestion()">Add Question</button>
+
+            <label for="startTime">Start Time:</label>
+            <input type="datetime-local" id="startTime" name="startTime" required>
+
+            <label for="endTime">End Time:</label>
+            <input type="datetime-local" id="endTime" name="endTime" required>
+
+            <button type="submit">Create Quiz</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+        let questionCount = 0;
+
+        // Function to add a new question dynamically
+        function addQuestion() {
+            questionCount++;
+            const questionHTML = `
+                <div class="question" id="question-${questionCount}">
+                    <h3>Question ${questionCount}</h3>
+                    <label>Question Text:</label>
+                    <input type="text" name="questionText-${questionCount}" placeholder="Enter question text" required>
+
+                    <label>Choices:</label>
+                    <div>
+                        <input type="text" name="choice-${questionCount}-1" placeholder="Choice 1" required>
+                        <input type="checkbox" name="isCorrect-${questionCount}-1"> Correct
+                    </div>
+                    <div>
+                        <input type="text" name="choice-${questionCount}-2" placeholder="Choice 2" required>
+                        <input type="checkbox" name="isCorrect-${questionCount}-2"> Correct
+                    </div>
+                    <div>
+                        <input type="text" name="choice-${questionCount}-3" placeholder="Choice 3" required>
+                        <input type="checkbox" name="isCorrect-${questionCount}-3"> Correct
+                    </div>
+                    <div>
+                        <input type="text" name="choice-${questionCount}-4" placeholder="Choice 4" required>
+                        <input type="checkbox" name="isCorrect-${questionCount}-4"> Correct
+                    </div>
+                    <button type="button" onclick="removeQuestion(${questionCount})">Remove Question</button>
+                </div>
+            `;
+            document.getElementById('questions-container').insertAdjacentHTML('beforeend', questionHTML);
+        }
+
+        // Function to remove a question
+        function removeQuestion(questionId) {
+            const questionElement = document.getElementById(`question-${questionId}`);
+            questionElement.remove();
+        }
+
+        // Function to handle quiz submission
+        document.getElementById('quiz-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            const questions = [];
+            for (let i = 1; i <= questionCount; i++) {
+                const questionElement = document.getElementById(`question-${i}`);
+                if (!questionElement) continue; // Skip if question was removed
+
+                const questionText = questionElement.querySelector(`input[name="questionText-${i}"]`).value;
+                const choices = [];
+                for (let j = 1; j <= 4; j++) {
+                    const choiceText = questionElement.querySelector(`input[name="choice-${i}-${j}"]`).value;
+                    const isCorrect = questionElement.querySelector(`input[name="isCorrect-${i}-${j}"]`).checked;
+                    choices.push({ text: choiceText, isCorrect });
+                }
+
+                questions.push({ questionText, choices });
+            }
+
+            try {
+                const token = sessionStorage.getItem('token');
+                if (!token) {
+                    alert('You are not logged in. Redirecting to login page.');
+                    window.location.href = '../index.html';
+                    return;
+                }
+
+                const response = await fetch('http://localhost:5000/api/teacher/quiz/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ title, description, questions, startTime, endTime }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('Quiz created successfully!');
+                    window.location.href = 'teacher.html'; // Redirect to the teacher dashboard
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error creating quiz:', error);
+                alert('An error occurred while creating the quiz. Please try again.');
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>

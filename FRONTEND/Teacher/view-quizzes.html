@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Quizzes - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>View Quizzes</h1>
+        <nav>
+            <ul>
+                <li><a href="teacher.html">Dashboard</a></li>
+                <li><a href="../index.html" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Running Quizzes</h2>
+            <div id="running-quizzes">
+                <p>Loading running quizzes...</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Upcoming Quizzes</h2>
+            <div id="upcoming-quizzes">
+                <p>Loading upcoming quizzes...</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Ended Quizzes</h2>
+            <div id="ended-quizzes">
+                <p>Loading ended quizzes...</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+        const baseUrl = 'http://localhost:5000/api'; // Backend API base URL
+        const token = sessionStorage.getItem('token');
+
+        // Redirect to login if token is missing
+        if (!token) {
+            alert('You are not logged in. Redirecting to login page.');
+            window.location.href = '../index.html';
+        }
+
+        // Fetch and display quizzes grouped by status
+        async function loadQuizzesByStatus() {
+            const runningContainer = document.getElementById('running-quizzes');
+            const upcomingContainer = document.getElementById('upcoming-quizzes');
+            const endedContainer = document.getElementById('ended-quizzes');
+
+            try {
+                const response = await fetch(`${baseUrl}/teacher/quiz/status`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch quizzes.');
+                }
+
+                const { running, upcoming, ended } = await response.json();
+
+                // Render running quizzes
+                runningContainer.innerHTML = running.length
+                    ? running.map(quiz => renderQuiz(quiz)).join('')
+                    : '<p>No running quizzes found.</p>';
+
+                // Render upcoming quizzes
+                upcomingContainer.innerHTML = upcoming.length
+                    ? upcoming.map(quiz => renderQuiz(quiz)).join('')
+                    : '<p>No upcoming quizzes found.</p>';
+
+                // Render ended quizzes
+                endedContainer.innerHTML = ended.length
+                    ? ended.map(quiz => renderQuiz(quiz)).join('')
+                    : '<p>No ended quizzes found.</p>';
+            } catch (error) {
+                console.error('Error loading quizzes:', error);
+                runningContainer.innerHTML = '<p>Error loading running quizzes.</p>';
+                upcomingContainer.innerHTML = '<p>Error loading upcoming quizzes.</p>';
+                endedContainer.innerHTML = '<p>Error loading ended quizzes.</p>';
+            }
+        }
+
+        // Helper function to render a quiz
+        function renderQuiz(quiz) {
+            return `
+                <div class="quiz">
+                    <h3>${quiz.title}</h3>
+                    <p>${quiz.description || 'No description available.'}</p>
+                    <p><strong>Start Time:</strong> ${new Date(quiz.startTime).toLocaleString()}</p>
+                    <p><strong>End Time:</strong> ${new Date(quiz.endTime).toLocaleString()}</p>
+                </div>
+            `;
+        }
+
+        // Load quizzes on page load
+        window.onload = loadQuizzesByStatus;
+
+        // Logout functionality
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>

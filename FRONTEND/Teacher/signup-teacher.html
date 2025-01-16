@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Signup - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Teacher Signup</h1>
+    </header>
+    <main>
+        <form id="teacher-signup-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter a secure password" required>
+
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" placeholder="Enter your subject expertise" required>
+
+            <button type="submit">Signup</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+        document.getElementById('teacher-signup-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Collect form data
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const subject = document.getElementById('subject').value.trim();
+
+            // Backend API URL for registration
+            const signupUrl = 'http://localhost:5000/api/teacher/auth/register';
+
+            try {
+                // Send signup request to backend
+                const response = await fetch(signupUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, subject }),
+                });
+
+                // Handle response
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Signup successful! Redirecting to login.');
+                    window.location.href = 'login-teacher.html'; // Redirect to the login page
+                } else {
+                    alert(`Signup failed: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error during signup:', error);
+                alert('An error occurred while signing up. Please try again later.');
+            }
+        });
+    </script>
+</body>
+</html>

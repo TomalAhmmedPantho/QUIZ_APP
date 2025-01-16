@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Associated Teachers - QuizPoint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>My Associated Teachers</h1>
+        <nav>
+            <ul>
+                <li><a href="student.html">Dashboard</a></li>
+                <li><a href="../index.html" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="teachers-container">
+            <p>Loading associated teachers...</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 QuizPoint. All rights reserved.</p>
+    </footer>
+    <script>
+        const baseUrl = 'http://localhost:5000/api'; // Backend API base URL
+        const token = sessionStorage.getItem('token');
+
+        // Redirect to login if token is missing
+        if (!token) {
+            alert('You are not logged in. Redirecting to login page.');
+            window.location.href = '../index.html';
+        }
+
+        // Fetch and display associated teachers
+        async function loadAssociatedTeachers() {
+            const container = document.getElementById('teachers-container');
+            try {
+                const response = await fetch(`${baseUrl}/student/teachers/associated`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch associated teachers.');
+                }
+
+                const data = await response.json();
+                const teachers = data.associatedTeachers || [];
+
+                if (teachers.length === 0) {
+                    container.innerHTML = '<p>No associated teachers found.</p>';
+                } else {
+                    container.innerHTML = teachers.map(teacher => `
+                        <div class="teacher">
+                            <h3>${teacher.name}</h3>
+                            <p><strong>Email:</strong> ${teacher.email}</p>
+                            <p><strong>Subject:</strong> ${teacher.subject}</p>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading associated teachers:', error);
+                container.innerHTML = `<p>${error.message}</p>`;
+            }
+        }
+
+        // Load associated teachers on page load
+        window.onload = loadAssociatedTeachers;
+
+        // Logout functionality
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>
