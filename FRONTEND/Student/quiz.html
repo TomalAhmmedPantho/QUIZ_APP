@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz - QuizPoint</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./S_style/quiz.css">
 </head>
 <body>
     <header>
@@ -91,8 +91,8 @@
                     : '<p>No upcoming quizzes found.</p>';
             } catch (error) {
                 console.error('Error loading quizzes:', error);
-                runningContainer.innerHTML = '<p>Error loading running quizzes.</p>';
-                upcomingContainer.innerHTML = '<p>Error loading upcoming quizzes.</p>';
+                runningContainer.innerHTML = '<p>No running quizzes.</p>';
+                upcomingContainer.innerHTML = '<p>No upcoming quizzes.</p>';
             }
         }
 

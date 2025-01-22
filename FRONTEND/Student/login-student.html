@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Login - QuizPoint</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./S_style/login-student.css">
 </head>
 <body>
     <header>
@@ -49,7 +49,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     sessionStorage.setItem('token', data.token); // Store the token in sessionStorage
-                    alert('Login successful!');
+                    // alert('Login successful!');
                     window.location.href = 'student.html'; // Redirect to the student dashboard
                 } else {
                     const errorData = await response.json();

@@ -22,5 +22,5 @@ router.get('/quiz/status', verifyTeacherToken, TeacherController.viewQuizzes);
 
 // Route to view submissions for a specific quiz
 router.get('/quiz/submissions', verifyTeacherToken, TeacherController.viewSubmissions);
-
+ 
 export default router;

@@ -1,0 +1,148 @@
+/* Global styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background-color: #eef2f7;
+    color: #444;
+    line-height: 1.8;
+}
+
+a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #1e88e5;
+}
+
+/* Header styles */
+header {
+    background: linear-gradient(135deg, #3a4b61, #2d3e50);
+    padding: 60px 20px;
+    text-align: center;
+    color: #fff;
+    border-bottom: 5px solid #1e88e5;
+}
+
+.header-content h1 {
+    font-size: 3.2em;
+    margin-bottom: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.header-content p {
+    font-size: 1.4em;
+    font-weight: 300;
+    color: #dfe3ea;
+}
+
+/* Main section for team */
+main {
+    padding: 60px 20px;
+}
+
+.team {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+    padding: 0 20px;
+}
+
+.team-member {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    text-align: center;
+    padding: 25px;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.team-member img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid #1e88e5;
+}
+
+.team-member h3 {
+    font-size: 1.6em;
+    margin-bottom: 12px;
+    color: #2d3e50;
+    font-weight: 600;
+}
+
+.team-member a {
+    color: #1e88e5;
+    font-weight: 600;
+    font-size: 1em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-top: 10px;
+    transition: color 0.3s ease;
+}
+
+.team-member a:hover {
+    color: #0056b3;
+}
+
+/* Footer styles */
+footer {
+    background: linear-gradient(135deg, #2d3e50, #3a4b61);
+    color: #dfe3ea;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 60px;
+    border-top: 5px solid #1e88e5;
+}
+
+footer p {
+    font-size: 1.1em;
+    font-weight: 300;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .team {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .team-member {
+        width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .team-member {
+        width: 100%;
+    }
+
+    header {
+        padding: 40px 10px;
+    }
+
+    .header-content h1 {
+        font-size: 2.5em;
+    }
+
+    .header-content p {
+        font-size: 1.1em;
+    }
+}

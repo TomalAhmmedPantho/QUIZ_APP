@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Login - QuizPoint</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./T_style/login-teacher.css">
 </head>
 <body>
     <header>
@@ -41,7 +41,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     sessionStorage.setItem('token', data.token);
-                    alert('Login successful!');
+                    // alert('Login successful!');
                     window.location.href = 'teacher.html'; // Redirect to teacher dashboard
                 } else {
                     const errorData = await response.json();

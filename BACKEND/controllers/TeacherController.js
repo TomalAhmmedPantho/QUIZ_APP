@@ -6,6 +6,7 @@ import Submission from '../models/Submission.js'
 
 
 class TeacherController {
+
     // Get all students associated with the teacher
     static async getAssociatedStudents(req, res) {
         try {

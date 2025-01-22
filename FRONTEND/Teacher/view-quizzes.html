@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Quizzes - QuizPoint</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./T_style/view-quizzes.css">
 </head>
 <body>
     <header>
@@ -72,17 +72,17 @@
                 // Render running quizzes
                 runningContainer.innerHTML = running.length
                     ? running.map(quiz => renderQuiz(quiz)).join('')
-                    : '<p>No running quizzes found.</p>';
+                    : '<p>No running quizzes... </p>';
 
                 // Render upcoming quizzes
                 upcomingContainer.innerHTML = upcoming.length
                     ? upcoming.map(quiz => renderQuiz(quiz)).join('')
-                    : '<p>No upcoming quizzes found.</p>';
+                    : '<p>No upcoming quizzes... </p>';
 
                 // Render ended quizzes
                 endedContainer.innerHTML = ended.length
                     ? ended.map(quiz => renderQuiz(quiz)).join('')
-                    : '<p>No ended quizzes found.</p>';
+                    : '<p>No ended quizzes... </p>';
             } catch (error) {
                 console.error('Error loading quizzes:', error);
                 runningContainer.innerHTML = '<p>Error loading running quizzes.</p>';

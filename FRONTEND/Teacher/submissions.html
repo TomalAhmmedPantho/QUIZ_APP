@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Submissions - QuizPoint</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./T_style/submissions.css">
 </head>
 <body>
     <header>
@@ -19,11 +19,11 @@
     <main>
         <section>
             <label for="quiz-search">Search by Quiz Title or ID:</label>
-            <input type="text" id="quiz-search" placeholder="Enter Quiz Title or ID" />
+            <input type="text" id="quiz-search" placeholder="Enter Quiz Title" />
             <button onclick="loadSubmissions()">Search</button>
         </section>
         <section id="submissions-container">
-            <p>Enter a Quiz Title or ID to view submissions.</p>
+            <p>Enter a Quiz Title to view submissions.</p>
         </section>
     </main>
     <footer>
@@ -45,7 +45,7 @@
             const container = document.getElementById('submissions-container');
 
             if (!searchQuery) {
-                container.innerHTML = '<p>Please enter a valid Quiz Title or ID.</p>';
+                container.innerHTML = '<p>Please enter a valid Quiz Title.</p>';
                 return;
             }
 
