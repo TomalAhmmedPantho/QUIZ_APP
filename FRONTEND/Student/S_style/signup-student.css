@@ -3,7 +3,196 @@ body, h1, p, ul, li, a {
     padding: 0;
     box-sizing: border-box;
 }
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
+body {
+    font-family: 'Poppins', 'Roboto', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #c7cbcf, #eef2f7);
+    color: #d3dbdd;
+    line-height: 1.6;
+}
+
+/* Header Styles */
+header {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: rgb(247, 240, 240);
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+header h1 {
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Main Content */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Form Styles */
+form {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #d6e2e6;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+input {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+input:focus {
+    outline: none;
+    border-color: #23a6d5;
+    box-shadow: 0 0 0 3px rgba(35, 166, 213, 0.1);
+}
+
+input::placeholder {
+    color: #a0aec0;
+}
+
+button {
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #23a6d5, #23d5ab);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(35, 166, 213, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Footer Styles */
+footer {
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    form {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    input {
+        padding: 10px 14px;
+    }
+
+    button {
+        padding: 12px 20px;
+    }
+}
+
+/* Error State */
+input:invalid {
+    border-color: #ff6b6b;
+}
+
+/* Success State */
+input:valid {
+    border-color: #51cf66;
+}
+
+/* Focus States */
+input:focus:invalid {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+input:focus:valid {
+    border-color: #51cf66;
+    box-shadow: 0 0 0 3px rgba(81, 207, 102, 0.1);
+}
+
+/* Loading State for Button */
+button.loading {
+    background: linear-gradient(135deg, #a0aec0, #718096);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Additional Animations */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.error-shake {
+    animation: shake 0.3s ease-in-out;
+}
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     line-height: 1.6;
